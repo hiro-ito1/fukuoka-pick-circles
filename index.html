@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1200">
+<title>ピックルボール サークル・スクール一覧</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+         margin: 0; background: #f5f6f8; color: #2c3e50; }
+  header { background: #2e7d52; color: #fff; padding: 20px 24px; }
+  header h1 { margin: 0; font-size: 22px; }
+  header p { margin: 6px 0 0; font-size: 13px; opacity: .9; }
+  .sitenav { background: #1a5c3a; padding: 9px 24px; display: flex; align-items: center;
+             gap: 20px; flex-wrap: wrap; border-bottom: 1px solid rgba(255,255,255,.1); }
+  .sitenav-label { color: rgba(255,255,255,.6); font-size: 12px; white-space: nowrap; }
+  .sitenav-link { color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none;
+                  letter-spacing: .02em; }
+  .sitenav-link:hover { color: #f9f871; text-decoration: underline; }
+  .sitenav-wip { color: #d4f1c0; font-size: 13px; }
+  .wip-badge { font-size: 11px; font-weight: 600; background: rgba(255,255,255,.30);
+               color: #d4f1c0; border: 1px solid rgba(255,255,255,.40);
+               padding: 2px 8px; border-radius: 4px; margin-left: 6px;
+               letter-spacing: .02em; vertical-align: middle; }
+  .controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+              padding: 16px 24px; background: #fff; border-bottom: 1px solid #e3e6ea; }
+  .tabs { display: flex; gap: 8px; }
+  .tab { padding: 8px 18px; border: 1px solid #2e7d52; background: #fff; color: #2e7d52;
+         border-radius: 20px; cursor: pointer; font-size: 14px; }
+  .tab.active { background: #2e7d52; color: #fff; }
+  .sort-box { margin-left: auto; font-size: 13px; }
+  select { padding: 6px 10px; border-radius: 6px; border: 1px solid #ccd; font-size: 13px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 16px; padding: 24px; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 12px; padding: 16px;
+          cursor: pointer; transition: box-shadow .15s, transform .15s; }
+  .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.10); transform: translateY(-2px); }
+  .card-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .name { font-weight: 700; font-size: 16px; }
+  .type-badge { font-size: 11px; padding: 2px 10px; border-radius: 10px; color: #fff; white-space: nowrap; }
+  .type-badge.circle { background: #4a6fa5; }
+  .type-badge.school { background: #e67e22; }
+  .venues { font-size: 13px; margin: 10px 0 6px; color: #444; line-height: 1.6; }
+  .slots { font-size: 13px; color: #555; margin-bottom: 8px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+  .pill { font-size: 11px; background: #e8f3ec; color: #2e7d52; padding: 2px 9px; border-radius: 10px; }
+  .pill.muted { background: #eee; color: #999; }
+  .atmo { font-size: 13px; color: #666; line-height: 1.5; min-height: 20px; }
+  .badges { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .badge { font-size: 11px; padding: 3px 10px; border-radius: 6px; }
+  .badge.rental { background: #fff3e0; color: #e67e22; border: 1px solid #ffd9a8; }
+  .badge.link { background: #e8eefc; color: #4a6fa5; border: 1px solid #c9d6f5; }
+  .empty { padding: 60px; text-align: center; color: #999; }
+  /* モーダル */
+  .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45);
+              justify-content: center; align-items: center; padding: 20px; z-index: 10; }
+  .modal-bg.open { display: flex; }
+  .modal { background: #fff; border-radius: 14px; max-width: 480px; width: 100%;
+           max-height: 85vh; overflow-y: auto; padding: 24px; }
+  .modal h2 { margin: 0 0 4px; font-size: 20px; }
+  .modal .row { margin: 12px 0; font-size: 14px; line-height: 1.6; }
+  .modal .label { font-weight: 700; color: #2e7d52; font-size: 13px; margin-bottom: 2px; }
+  .modal a { color: #4a6fa5; text-decoration: none; margin-right: 12px; }
+  .modal a:hover { text-decoration: underline; }
+  .close-btn { float: right; cursor: pointer; font-size: 22px; color: #999; line-height: 1; }
+  .note { font-size: 12px; color: #888; background: #f7f7f7; padding: 8px 12px; border-radius: 6px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🥒 ピックルボール サークル・スクール一覧</h1>
+  <p>福岡近郊で活動するサークル・スクールの紹介ページ（公開 1 件）</p>
+</header>
+
+<nav class="sitenav">
+  <span class="sitenav-label">姉妹サイト：</span>
+  <a class="sitenav-link" href="https://hiro-ito1.github.io/fukuoka-ten-shi/" target="_blank" rel="noopener">🎾 テニス試合情報</a>
+  <span class="sitenav-wip">🥒 ピックルボール試合情報<span class="wip-badge">工事中</span></span>
+</nav>
+
+<div class="controls">
+  <div class="tabs">
+    <div class="tab active" data-tab="サークル" onclick="setTab('サークル', this)">サークル</div>
+    <div class="tab" data-tab="スクール" onclick="setTab('スクール', this)">スクール</div>
+  </div>
+  <div class="sort-box">
+    並び替え:
+    <select id="sortSel" onchange="applyFilter()">
+      <option value="beginner">初心者から</option>
+      <option value="advanced">上級から</option>
+    </select>
+  </div>
+</div>
+
+<div class="grid" id="grid">
+
+    <div class="card" data-type="サークル" data-minlv="0" data-maxlv="5"
+         data-id="circle_001" onclick="showDetail('circle_001')">
+      <div class="card-head">
+        <span class="name">テストインフィニティ</span>
+        <span class="type-badge circle">サークル</span>
+      </div>
+      <div class="venues">📍 大野城市（場所は変わる可能性あり）</div>
+      <div class="slots">🗓 月夜・土午後</div>
+      <div class="pills"><span class='pill'>初心</span><span class='pill'>初級</span><span class='pill'>中級</span><span class='pill'>中上</span><span class='pill'>上級</span></div>
+      <div class="atmo"></div>
+      <div class="badges"><span class='badge rental'>パドルレンタルあり</span></div>
+    </div>
+</div>
+<div class="empty" id="empty" style="display:none">該当するサークル・スクールがありません。</div>
+
+<div class="modal-bg" id="modalBg" onclick="closeDetail(event)">
+  <div class="modal" id="modalBody" onclick="event.stopPropagation()"></div>
+</div>
+
+<script>
+  const DETAILS = {"circle_001": {"name": "テストインフィニティ", "type": "サークル", "venues": ["大野城市（場所は変わる可能性あり）"], "slots": "月夜・土午後", "levels": ["初心", "初級", "中級", "中上", "上級"], "atmosphere": "", "rental": "あり", "links": [], "contact": ""}};
+  let currentTab = "サークル";
+
+  function setTab(tab, el) {
+    currentTab = tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    applyFilter();
+  }
+
+  function applyFilter() {
+    const sort = document.getElementById('sortSel').value;
+    const grid = document.getElementById('grid');
+    let cards = Array.from(grid.querySelectorAll('.card'));
+
+    cards.forEach(c => {
+      c.style.display = (c.dataset.type === currentTab) ? '' : 'none';
+    });
+
+    const visible = cards.filter(c => c.style.display !== 'none');
+    visible.sort((a, b) => {
+      if (sort === 'beginner') {
+        return (+a.dataset.minlv) - (+b.dataset.minlv);
+      } else {
+        return (+b.dataset.maxlv) - (+a.dataset.maxlv);
+      }
+    });
+    visible.forEach(c => grid.appendChild(c));
+
+    document.getElementById('empty').style.display = visible.length ? 'none' : 'block';
+  }
+
+  function showDetail(id) {
+    const d = DETAILS[id];
+    if (!d) return;
+    const venues = d.venues.length ? d.venues.map(v => '📍 ' + esc(v)).join('<br>') : '—';
+    const levels = d.levels.length ? d.levels.map(l => "<span style='background:#e8f3ec;color:#2e7d52;padding:2px 9px;border-radius:10px;font-size:12px;margin-right:4px'>" + esc(l) + "</span>").join('') : '—';
+    let linksHtml = d.links.map(l => "<a href='" + esc(l.url) + "' target='_blank' rel='noopener'>" + esc(l.label) + "</a>").join('');
+    if (d.contact) linksHtml += "<span style='color:#555'>連絡先: " + esc(d.contact) + "</span>";
+    if (!linksHtml) linksHtml = '—';
+
+    document.getElementById('modalBody').innerHTML =
+      "<span class='close-btn' onclick='closeDetail()'>&times;</span>" +
+      "<h2>" + esc(d.name) + "</h2>" +
+      "<div style='margin-bottom:8px'><span class='type-badge " + (d.type === 'スクール' ? 'school' : 'circle') + "'>" + esc(d.type) + "</span></div>" +
+      "<div class='row'><div class='label'>開催場所</div>" + venues + "</div>" +
+      "<div class='row'><div class='label'>曜日・時間帯</div>🗓 " + (esc(d.slots) || '—') + "</div>" +
+      "<div class='row'><div class='label'>レベル</div>" + levels + "</div>" +
+      "<div class='row'><div class='label'>雰囲気・特徴</div>" + (esc(d.atmosphere) || '—') + "</div>" +
+      "<div class='row'><div class='label'>パドルレンタル</div>" + esc(d.rental) + "</div>" +
+      "<div class='row'><div class='label'>リンク・連絡先</div>" + linksHtml + "</div>" +
+      "<div class='row note'>参加費・詳細はHPをご確認ください。</div>";
+    document.getElementById('modalBg').classList.add('open');
+  }
+
+  function closeDetail(e) {
+    document.getElementById('modalBg').classList.remove('open');
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  applyFilter();
+</script>
+</body>
+</html>
